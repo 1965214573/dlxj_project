@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>userForm</title>
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+</head>
+<body>
+<form class="layui-form" action="" >
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="roleName" required  lay-verify="required" placeholder="请输入角色名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addRole">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="../../layui/layui.js"></script>
+<script>
+    layui.use('form',function (){
+        let form = layui.form;
+        form.on('submit(addRole)', function (data) {
+            layer.msg(JSON.stringify(data.field))
+        })
+    })
+</script>
+</body>
+</html>

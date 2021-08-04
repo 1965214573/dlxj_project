@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.FaultMapper">
+    <select id="findAllFaultType" resultType="com.example.pojo.FaultType">
+        select * from fault_type
+        <if test="page!=null">
+            limit #{page},#{limit};
+        </if>
+    </select>
+    <select id="countFaultType" resultType="_int">
+        select count(*) from fault_type
+        <if test="page!=null">
+            limit #{page},#{limit};
+        </if>
+    </select>
+    <insert id="addFaultType" parameterType="com.example.pojo.FaultType">
+        insert into fault_type (fault_name, fault_status) VALUES (#{faultName}, #{faultStatus})
+    </insert>
+    <update id="updateFaultType" parameterType="com.example.pojo.FaultType">
+        update fault_type set fault_name = #{faultName}, fault_status = #{faultStatus} where id = #{id};
+    </update>
+    <delete id="delFaultTypeById">
+        delete from fault_type where id = #{id};
+    </delete>
+    <select id="findAllFaultList" resultType="com.example.VO.FaultListInfo">
+        select * from faultlist
+        <if test="page!=null">
+            limit #{page},#{limit}
+        </if>
+    </select>
+    <select id="findFaultTypeById" resultType="com.example.pojo.FaultType">
+        select * from fault_type where id = #{faultId};
+    </select>
+    <select id="countFaultList" resultType="_int">
+        select count(*) from faultlist
+        <if test="page!=null">
+            limit #{page},#{limit}
+        </if>
+    </select>
+</mapper>

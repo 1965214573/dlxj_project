@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>杆塔管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../css/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">所属线路</label>
+                    <div class="layui-input-block">
+                        <select name="routeId" lay-verify="required" id="route">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">是否启用</label>
+                    <div class="layui-input-block">
+                        <select name="towerStatus">
+                            <option value="1">启用</option>
+                            <option value="0">停止</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-user-front-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add">添加</button>
+            </div>
+
+            <table id="LAY-user-manage" lay-filter="LAY-user-manage"></table>
+            <!--头像显示-->
+            <script type="text/html" id="imgTpl">
+                <img style="display: inline-block; width: 50%; height: 100%;" src={{ d.avatar }}
+                     onclick="showBigImage(this);">
+            </script>
+            <!--状态判断-->
+            <script type="text/html" id="statusTpl">
+                {{#  if(d.towerStatus == 1){ }}
+                <button class="layui-btn layui-btn-xs">启用</button>
+                {{#  } else { }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">停止</button>
+                {{#  } }}
+            </script>
+
+
+            <script type="text/html" id="table-useradmin-webuser">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="change_status"
+                   style="background-color: #17b3a3!important;">
+                    {{#  if(d.towerStatus == 1){ }}
+                    停止
+                    {{#  } else { }}
+                    启用
+                    {{#  } }}
+                </a>
+                <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="start">启用</a>-->
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>修改</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="../../layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['layer', 'table', 'form'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , table = layui.table;
+
+        $.ajax({
+            url: '/getAllRoute',
+            dataType: 'json',
+            type: 'get',
+            success: function(res) {
+                console.log(res.data)
+                $("#route").empty();
+                $("#route").append(new Option("请选择线路", "0"));
+                $.each(res.data, function (index, item) {
+                    $('#route').append(new Option(item.routeName, item.id));
+                });
+
+                //重新渲染
+                form.render("select");
+            }
+        });
+
+        //加载table
+        table.render({
+            elem: '#LAY-user-manage'
+            , url: '/getTower'
+            , cellMinWidth: 80 //全局定义常规单元格的最小宽度
+            , title: '杆塔数据表'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', align: 'center'}
+                , {field: 'number', title: '杆塔编号', align: 'center'}
+                , {field: 'routeName', title: '所属路线', align: 'center'}
+                , {field: 'towerStatus', title: '状态（启用/停止）', templet: '#statusTpl', align: 'center'}
+                , {fixed: 'right', title: '操作', toolbar: '#table-useradmin-webuser', width: 350, align: 'center'}
+            ]]
+            , page: true
+        });
+
+
+        //监听搜索
+        form.on('submit(LAY-user-front-search)', function (data) {
+            var field = data.field;
+
+            //执行重载
+            table.reload('LAY-user-manage', {
+                url: '/getTower',
+                where: field
+            });
+        });
+
+        //事件
+        var active = {
+            batchdel: function () {
+                var checkStatus = table.checkStatus('LAY-user-manage')
+                    , checkData = checkStatus.data; //得到选中的数据
+
+                if (checkData.length === 0) {
+                    return layer.msg('请选择数据');
+                }
+
+                layer.confirm('确定删除吗？', function(index) {
+                    //定义空数组
+                    var ids = new Array();
+                    $.each(checkData, function (index, item) {
+                        //每循环一次，将id取出，塞给数组。
+                        ids.push(item.id)
+                    })
+                    //通过Ajax访问后台实现删除功能
+                    $.ajax({
+                        url: "/batchTowerdel",
+                        type: "post",
+                        data: {ids: ids}, //直接传数组
+                        traditional: true, //用传统的方式来序列化数据
+                        dataType: "json",
+                        success: function (res) {
+                            if (res.code == 200) {
+                                layer.msg(res.msg);
+                                //执行重载
+                                table.reload('LAY-user-manage', {
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                    , where: {
+                                        key: {
+                                            id: new Date().getTime()
+                                        }
+                                    }
+                                });
+                            }
+                            if (res.code == 500) {
+                                layer.msg(res.msg);
+                            }
+                        }
+                    })
+                })
+            }
+            , add: function () {
+                layer.open({
+                    type: 2
+                    , title: '添加杆塔'
+                    , content: 'child_tower/addtower.html'
+                    , maxmin: true
+                    , area: ['500px', '450px']
+                    , btn: ['确定', '取消']
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submitID = 'LAY-user-front-submit'
+                            , submit = layero.find('iframe').contents().find('#' + submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url: '/addTower',
+                                type:'post',
+                                data: field,
+                                dataType: 'json',
+                                success: function (res) {
+                                    if (res.code == 200) {
+                                        layer.msg(res.msg);
+                                        //执行重载
+                                        table.reload('LAY-user-manage', {
+                                            where: {
+                                                key: {
+                                                    id: new Date().getTime()
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            table.reload('LAY-user-front-submit'); //数据刷新
+                            layer.close(index); //关闭弹层
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            },
+
+
+        }
+
+        //工具行时间监听
+        table.on('tool(LAY-user-manage)', function (obj) {
+            var data = obj.data;
+//            console.log(data)
+            if (obj.event === 'change_status') {
+                $.ajax({
+                    url:'/changeTowerStatus',
+                    type:'post',
+                    data:data,
+                    dataType:'json',
+                    success: function (res) {
+                        if (res.code == 200) {
+                            layer.msg(res.msg);
+                            //执行重载
+                            table.reload('LAY-user-manage', {
+                                page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                                , where: {
+                                    key: {
+                                        id: new Date().getTime()
+                                    }
+                                }
+                            });
+                        }
+                        if (res.code == 500) {
+                            layer.msg(res.msg);
+                        }
+                    }
+                })
+            } else if (obj.event === 'edit') {
+                layer.open({
+                    type: 2
+                    , title: '修改杆塔'
+                    , content: 'child_tower/towerform.html'
+                    , maxmin: true
+                    , area: ['400px', '500px']
+                    , btn: ['确定', '取消']
+                    , success: function (layero, index) {//在页面加载成功之前将数据回显
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = layero.find('iframe')[0].contentWindow; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+                        //console.log(body.html()) //得到iframe页的body内容
+                        body.find('input[name=id]').val(data.id);
+                        body.find('input[name=number]').val(data.number);
+                        $.ajax({
+                            url: '/getAllRoute',
+                            dataType: 'json',
+                            type: 'get',
+                            async:false,
+                            success: function(res) {
+                                body.find('select[id=route]').empty();
+                                body.find('select[id=route]').append(new Option("请选择线路", "0"));
+                                $.each(res.data, function (index, item) {
+                                    body.find('select[id=route]').append(new Option(item.routeName, item.id));
+                                });
+
+
+                                form.render("select");
+
+                            }
+                        });
+
+                        body.find('select option[value=' + data.routeId + ']').attr("selected", "selected");
+                        body.find('input[name=towerStatus][value=' + data.towerStatus + ']').attr("checked", "checked");
+                        //重载
+                        iframeWin.layui.form.render("select");
+                        iframeWin.layui.form.render("radio");
+                    }
+                    , yes: function (index, layero) {
+                        var iframeWindow = window['layui-layer-iframe' + index]
+                            , submitID = 'LAY-user-front-submit'
+                            , submit = layero.find('iframe').contents().find('#' + submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                            var field = data.field; //获取提交的字段
+                            layer.alert(JSON.stringify(data.field))
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            //$.ajax({});
+                            table.reload('LAY-user-front-submit'); //数据刷新
+                            layer.close(index); //关闭弹层
+                            console.log(field)
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url: "/addUser",
+                                type: "post",
+                                data: field,
+                                dataType: "json",
+                                success: function (res) {
+                                    if (res.code == 200) {
+                                        layer.msg(res.msg);
+                                        //执行重载
+                                        table.reload('LAY-user-manage', {
+                                            where: {
+                                                key: {
+                                                    id: new Date().getTime()
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            table.reload('LAY-user-front-submit'); //数据刷新
+                            layer.close(index); //关闭弹层
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+
+
+            } else if (obj.event === 'del') {
+                layer.confirm('确定删除吗？',function (index) {
+                    $.ajax({
+                        url:'/delTower',
+                        type:'post',
+                        data:data,
+                        dataType:'json',
+                        success: function (res) {
+                            if (res.code == 200) {
+                                layer.msg(res.msg);
+                                //执行重载
+                                table.reload('LAY-user-manage', {
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                    , where: {
+                                        key: {
+                                            id: new Date().getTime()
+                                        }
+                                    }
+                                });
+                            }
+                            if (res.code == 500) {
+                                layer.msg(res.msg);
+                            }
+                        }
+                    })
+                })
+            }
+        });
+
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+</html>

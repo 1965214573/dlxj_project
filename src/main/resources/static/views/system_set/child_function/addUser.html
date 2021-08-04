@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <link rel="stylesheet" href="../../../layui/css/layui.css">
+</head>
+<body>
+<form class="layui-form" action="">
+  <div class="layui-form-item layui-hide">
+    <label class="layui-form-label">隐藏域</label>
+    <div class="layui-input-block">
+      <input type="text" name="id">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">登陆账号</label>
+    <div class="layui-input-block">
+      <input type="text" name="loginAccount" required  lay-verify="required" placeholder="请输入用户账号" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">用户名称</label>
+    <div class="layui-input-block">
+      <input type="text" name="userName" required  lay-verify="required" placeholder="请输入用户名称" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">角色分配</label>
+    <div class="layui-input-block">
+      <select name="roleId" lay-verify="required" id="roles">
+        <option value="0">请选择角色</option>
+      </select>
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">邮箱</label>
+    <div class="layui-input-block">
+      <input type="email" name="email" required  lay-verify="required" placeholder="请输入邮箱账号" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">入职日期</label>
+    <div class="layui-input-block">
+      <input type="text" name="entryDate" required  lay-verify="required" id="entryDate" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">离职日期</label>
+    <div class="layui-input-block">
+      <input type="text" name="resignDate" required  lay-verify="required" id="resignDate" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item layui-hide">
+    <div class="layui-input-block">
+      <button class="layui-btn" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit">立即提交</button>
+      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+  </div>
+</form>
+<script type="text/javascript" src="../../../layui/layui.js"></script>
+<script>
+  layui.use(['form','laydate'], function () {
+    let form = layui.form;
+    let laydate = layui.laydate;
+    let $ = layui.$;
+
+    laydate.render({
+      elem:'#entryDate'
+    });
+    laydate.render({
+      elem:'#resignDate'
+    });
+
+    $.ajax({
+      url: '/user/getRoleList',
+      dataType: 'json',
+      type: 'get',
+      success: function(res) {
+
+        $("#roles").empty();
+        $("#roles").append(new Option("请选择服务", "0"));
+        $.each(res.data, function (index, item) {
+          $('#roles').append(new Option(item.roleName, item.id));
+        });
+
+        //重新渲染
+        form.render("select");
+      }
+    });
+
+
+  })
+</script>
+</body>
+</html>

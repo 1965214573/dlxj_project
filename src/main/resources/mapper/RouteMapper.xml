@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.RouteMapper">
+    <insert id="addTower">
+        insert into towers (number, route_id, tower_status) VALUES (#{number},#{routeId},#{towerStatus})
+    </insert>
+    <select id="findTower" resultType="com.example.VO.TowerInfo">
+        select * from towers
+        <where>
+            <if test="routeId!=null &amp; routeId!=0">
+                and route_id = #{routeId}
+            </if>
+            <if test="towerStatus!=null">
+                and tower_status = #{towerStatus}
+            </if>
+        </where>
+        <if test="page!=null">
+            limit #{page},#{limit}
+        </if>
+    </select>
+    <select id="findTowerById" resultType="com.example.pojo.Towers">
+        select * from towers where id = #{towerId}
+    </select>
+    <select id="countTower" resultType="_int">
+        select count(*) from towers
+        <where>
+            <if test="routeId!=null">
+                and route_id = #{routeId}
+            </if>
+            <if test="towerStatus!=null">
+                and tower_status = #{towerStatus}
+            </if>
+        </where>
+        <if test="page!=null">
+            limit #{page},#{limit}
+        </if>
+    </select>
+    <delete id="delTowerById">
+        delete from towers where id = #{id};
+    </delete>
+    <update id="changeTowerStatus">
+        update towers set tower_status = #{towerStatus} where id = #{id}
+    </update>
+    <select id="findRouteById" resultType="com.example.pojo.Routes">
+        select * from routes where id = #{routeId};
+    </select>
+    <insert id="addRoute" parameterType="com.example.pojo.Routes">
+        insert into routes
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            route_number, route_name, route_length, circle_length, operated_date, voltage_class, start_tower_number, end_tower_number,tower_count,route_run_status, route_status,
+            <if test="routeComment!=null">
+                route_comment,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{routeNumber}, #{routeName}, #{routeLength}, #{circleLength}, #{operatedDate}, #{voltageClass}, #{startTowerNumber}, #{endTowerNumber},#{towerCount}, #{routeRunStatus}, #{routeStatus},
+            <if test="routeComment!=null">
+                #{routeComment},
+            </if>
+        </trim>
+    </insert>
+    <select id="findAllRoute" resultType="com.example.pojo.Routes">
+        select * from routes
+        <where>
+            <if test="routeNumber!=null &amp; routeNumber!=''">
+                and route_number = #{routeNumber}
+            </if>
+            <if test="routeRunStatus!=null">
+                and route_run_status = #{routeRunStatus}
+            </if>
+        </where>
+        <if test="page!=null">
+            limit #{page},#{limit};
+        </if>
+    </select>
+    <select id="findRoute" resultType="com.example.pojo.Routes">
+        select * from routes;
+    </select>
+    <select id="countRoute" resultType="_int">
+        select count(*) from routes
+        <where>
+            <if test="routeNumber!=null &amp; routeNumber!=''">
+                and route_number = #{routeNumber}
+            </if>
+            <if test="routeRunStatus!=null">
+                and route_run_status = #{routeRunStatus}
+            </if>
+        </where>
+        <if test="page!=null">
+            limit #{page},#{limit};
+        </if>
+    </select>
+    <update id="updateRoute" parameterType="com.example.VO.RouteInfo">
+        update routes set  route_number = #{routeNumber}, route_name = #{routeName}, route_length = #{routeLength}, circle_length = #{circleLength}, operated_date = #{operatedDate}, voltage_class = #{voltageClass}, start_tower_number = #{startTowerNumber}, end_tower_number = #{endTowerNumber}, tower_count = #{towerCount}, route_status = #{routeStatus}, route_comment = #{routeComment} where id = #{routeId}
+    </update>
+    <delete id="delRouteById">
+        delete from routes where id = #{id};
+    </delete>
+    <update id="changeRouteStatus">
+        update routes set route_status = #{routeStatus} where id = #{id}
+    </update>
+    <update id="editTowerById"></update>
+
+</mapper>

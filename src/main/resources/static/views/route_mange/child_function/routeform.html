@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>新增线路</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../layui/css/layui.css" media="all">
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+
+<form class="layui-form" >
+    <div class="layui-form-item" style="margin-left: 100px;">
+        <label class="layui-form-label">线路编号：</label>
+        <div class="layui-input-inline " style="width: 300px;margin-right: 100px">
+            <input type="text" name="routeNumber" lay-verify="required"  placeholder="请输入线路编号" autocomplete="off" class="layui-input">
+        </div>
+
+        <label class="layui-form-label">线路名称：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="routeName" lay-verify="required" placeholder="请输入线路名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item" style="margin-left: 100px;">
+        <label class="layui-form-label">线路长度：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="routeLength" lay-verify="required" placeholder="请输入线路长度" autocomplete="off" class="layui-input">
+        </div>
+
+        <label class="layui-form-label">回路长度：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="circleLength" lay-verify="required" placeholder="请输入回路长度" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="margin-left: 100px;margin-top: 35px">
+        <label class="layui-form-label">投运日期：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="operatedDate" class="layui-input" id="operatedDate" placeholder="yyyy-MM-dd">
+        </div>
+
+        <label class="layui-form-label">电压等级：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="voltageClass" lay-verify="required" placeholder="请输入电压等级" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="margin-left: 100px;margin-top: 35px">
+        <label class="layui-form-label">起始杆号：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="startTowerNumber" lay-verify="required" placeholder="请输入起始杆号" autocomplete="off" class="layui-input">
+        </div>
+
+        <label class="layui-form-label">终止杆号：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="endTowerNumber" lay-verify="required" placeholder="请输入终止杆号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item" style="margin-left: 100px;margin-top: 35px">
+        <label class="layui-form-label">塔基数：</label>
+        <div class="layui-input-inline" style="width: 300px;margin-right: 100px">
+            <input type="text" name="towerCount" lay-verify="required" placeholder="请输入塔基数" autocomplete="off" class="layui-input">
+        </div>
+
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-inline">
+            <textarea name="routeComment"style="min-height: 100px;width: 300px" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否启用：</label>
+            <div class="layui-input-block">
+                <input type="radio" name="routeStatus" value="1" title="启用" checked>
+                <input type="radio" name="routeStatus" value="0" title="停用" >
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" name="routeId">
+
+    <div class="layui-form-item layui-hide" style="text-align: center">
+        <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-front-submit" value="确认">
+    </div>
+
+
+
+</form>
+
+<!--作为单独引入，注意放置在引入layui.js之前-->
+<script src="../../../layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['laydate'], function () {
+        let laydate = layui.laydate;
+        //投运日期
+        laydate.render({
+            elem: '#operatedDate'
+        });
+    })
+</script>
+</body>
+</html>

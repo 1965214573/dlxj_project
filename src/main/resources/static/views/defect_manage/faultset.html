@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>缺陷类型设置</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../css/admin.css" media="all">
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-useradmin" data-type="add" >添加缺陷类型</button>
+            </div>
+
+            <table id="LAY-faultconfirm-manage" lay-filter="LAY-faultconfirm-manage"></table>
+
+            <script type="text/html" id="table-useradmin-webuser">
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="change_status"><i class="layui-icon layui-icon-set"></i>
+                    {{#  if(d.faultStatus == 1){ }}
+                    停用
+                    {{#  } else { }}
+                    启用
+                    {{#  } }}
+                </a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>修改</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script src="../../layui/layui.js"></script>
+
+<script type="text/html" id="checkDemo">
+    {{#  if(d.faultStatus == 1){ }}
+    <button class="layui-btn layui-btn-xs">启用</button>
+    {{#  } else { }}
+    <button class="layui-btn layui-btn-primary layui-btn-xs">停用</button>
+    {{#  } }}
+</script>
+
+
+<script type="text/javascript">
+    layui.use(['layer','table','form'], function(){
+        var $ = layui.$
+            ,form = layui.form
+            ,table = layui.table;
+
+        table.render({
+            elem: '#LAY-faultconfirm-manage'
+            ,url:'/findAllFault'
+            ,cellMinWidth: 80//全局定义常规单元格的最小宽度
+            ,title: '缺陷类型设置表'
+            ,cols: [[
+                ,{field:'id', title:'ID',align:'center'}
+                ,{field:'faultName', title:'缺陷类型名称',align:'center'}
+                ,{title:'状态（启用/未启用）', toolbar: '#checkDemo',align:'center'}
+                ,{ title:'操作', toolbar: '#table-useradmin-webuser',align:'center'}
+
+            ]]
+            ,page: true
+        });
+
+
+        //事件
+        var active = {
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加缺陷类型'
+                    ,content: 'child_function/faultform.html'
+                    ,maxmin: true
+                    ,area: ['1180px', '600px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'LAY-user-front-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field; //获取提交的字段
+
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:"/addFaultType",
+                                type:"post",
+                                data:field,
+                                dataType:"json",
+                                success:function (res) {
+                                    if(res.code == 200){
+                                        layer.msg(res.msg);
+                                        //执行重载
+                                        table.reload('LAY-faultconfirm-manage', {
+                                            where: {
+                                                key: {
+                                                    id: new Date().getTime()
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            table.reload('LAY-user-front-submit'); //数据刷新
+                            layer.close(index); //关闭弹层
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+            }
+        };
+
+        //监听行工具事件
+        table.on('tool(LAY-faultconfirm-manage)', function(obj){
+            var data = obj.data;
+             if(obj.event === 'edit'){
+                layer.open({
+                    type: 2
+                    ,title: '修改缺陷类型'
+                    ,content: 'child_function/faultform.html'
+                    ,maxmin: true
+                    ,area: ['450px', '300px']
+                    ,btn: ['保存', '返回']
+                    ,success: function(layero, index){  //在页面加载成功之前将数据回显
+                        var body = layer.getChildFrame('body', index);
+                        var iframeWin = layero.find('iframe')[0].contentWindow; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+
+                        body.find('input[name=id]').val(data.id);
+                        body.find('input[name=faultName]').val(data.faultName);
+                        body.find('#faultStatus input[value='+data.faultStatus+']').attr("checked","checked");
+                        //重载
+                        iframeWin.layui.form.render("radio");
+                    }
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                            ,submitID = 'LAY-user-front-submit'
+                            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
+                            var field = data.field; //获取提交的字段
+                            $.ajax({
+                                url:"/updateFaultType",
+                                type:"post",
+                                data:field,
+                                dataType:"json",
+                                success:function (res) {
+                                    if(res.code == 200){
+                                        layer.msg(res.msg);
+                                        //执行重载
+                                        table.reload('LAY-faultconfirm-manage', {
+                                            where: {
+                                                key: {
+                                                    id: new Date().getTime()
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            table.reload('LAY-user-front-submit'); //数据刷新
+                            layer.close(index);
+                        });
+
+                        submit.trigger('click');
+                    }
+                });
+
+
+            } else if(obj.event === 'del'){
+                 layer.confirm('确定删除吗？', function(index) {
+                     $.ajax({
+                         url:'/delFaultType',
+                         type:'post',
+                         data:data,
+                         dataType:'json',
+                         success: function (res) {
+                             if (res.code == 200) {
+                                 layer.msg(res.msg);
+                                 //执行重载
+                                 table.reload('LAY-faultconfirm-manage', {
+                                     page: {
+                                         curr: 1 //重新从第 1 页开始
+                                     }
+                                     , where: {
+                                         key: {
+                                             id: new Date().getTime()
+                                         }
+                                     }
+                                 });
+                             }
+                             if (res.code == 500) {
+                                 layer.msg(res.msg);
+                             }
+                         }
+                     })
+                 });
+            }
+        });
+
+        $('.layui-btn.layuiadmin-btn-useradmin').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+</html>

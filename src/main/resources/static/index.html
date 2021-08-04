@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>电力巡检系统</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <!--引入本地layui.css-->
+  <link rel="stylesheet" href="layui/css/layui.css" media="all">
+  <!--引入本地自定义的admin.css-->
+  <link rel="stylesheet" href="css/admin.css" media="all">
+
+  <script>
+  /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
+  </script>
+</head>
+<body class="layui-layout-body">
+
+  <div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+      <div class="layui-header" style="background-color: #17b3a3 !important;">
+        <!-- 头部区域 -->
+        <ul class="layui-nav layui-layout-left">
+          <li class="layui-nav-item layadmin-flexible" lay-unselect>
+            <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+              <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="#" target="_blank" title="前台">
+              <i class="layui-icon layui-icon-website"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;" layadmin-event="refresh" title="刷新">
+              <i class="layui-icon layui-icon-refresh-3"></i>
+            </a>
+          </li>
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <input type="text" placeholder="搜索..." autocomplete="off" class="layui-input layui-input-search" layadmin-event="serach" lay-action="template/search.html?keywords=">
+          </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right" lay-filter="layadmin-layout-right">
+
+          <li class="layui-nav-item" lay-unselect>
+            <a lay-href="views/about/index.html" layadmin-event="message" lay-text="消息中心">
+              <i class="layui-icon layui-icon-notice"></i>
+
+              <!-- 如果有新消息，则显示小圆点 -->
+              <span class="layui-badge-dot"></span>
+            </a>
+          </li>
+          <li class="layui-nav-item" lay-unselect>
+            <a href="javascript:;">
+              <cite id="login_account">admin</cite>
+            </a>
+            <dl class="layui-nav-child">
+              <dd><a lay-href="views/set/info.html">基本资料</a></dd>
+              <dd><a lay-href="views/set/password.html">修改密码</a></dd>
+              <hr>
+              <dd layadmin-event="logout" style="text-align: center;"><a>退出</a></dd>
+            </dl>
+          </li>
+
+          <li class="layui-nav-item layui-hide-xs" lay-unselect>
+            <a href="javascript:;"><i class="layui-icon layui-icon-more-vertical"></i></a>
+          </li>
+        </ul>
+      </div >
+
+      <!-- 侧边菜单 -->
+      <div class="layui-side layui-side-menu" style="background-color: rgb(84, 92, 100)!important;">
+        <div class="layui-side-scroll">
+          <div class="layui-logo" lay-href="home/console.html" style="background-color: rgb(84, 92, 100)!important;">
+            <span><img src="images/logo.png" width="180" alt=""></span>
+          </div>
+
+          <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+            <!--首页-->
+            <li data-name="home" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="主页" lay-direction="2">
+                <i class="layui-icon layui-icon-transfer"></i>
+                <cite>主页</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/home/homepage.html">控制台</a>
+                </dd>
+              </dl>
+            </li>
+            <!--系统设置-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="设置" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>系统设置</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/system_set/rolelist.html">角色管理</a>
+                </dd>
+                <dd>
+                  <i class="layui-icon layui-icon-group"></i>
+                  <a lay-href="views/system_set/userlist.html">用户管理</a>
+                </dd>
+              </dl>
+            </li>
+            <!--杆塔管理-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="杆塔" lay-direction="2">
+                <i class="layui-icon layui-icon-transfer"></i>
+                <cite>杆塔管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/tower_manage/towerlist.html">杆塔管理</a>
+                </dd>
+              </dl>
+            </li>
+            <!--线路管理-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="线路" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>线路管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/route_mange/routelist.html">线路管理</a>
+                </dd>
+              </dl>
+            </li>
+            <!--缺陷管理-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="缺陷" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>缺陷管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/defect_manage/faultset.html">缺陷类型设置</a>
+                </dd>
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/defect_manage/faultconfirm.html">缺陷等级确认</a>
+                </dd>
+              </dl>
+            </li>
+            <!--巡检任务管理-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="巡检任务" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>巡检任务管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">巡检任务制定与分配</a>
+                </dd>
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">巡检任务执行与回执</a>
+                </dd>
+              </dl>
+            </li>
+            <!--消缺任务管理-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="消缺任务" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>消缺任务管理</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">消缺任务制定与分配</a>
+                </dd>
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">消缺任务执行与回执</a>
+                </dd>
+              </dl>
+            </li>
+            <!--信息统计-->
+            <li data-name="set" class="layui-nav-item">
+              <a href="javascript:;" lay-tips="信息统计" lay-direction="2">
+                <i class="layui-icon layui-icon-set"></i>
+                <cite>信息统计</cite>
+              </a>
+              <dl class="layui-nav-child">
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">巡检记录统计</a>
+                </dd>
+                <dd>
+                  <i class="layui-icon layui-icon-find-fill"></i>
+                  <a lay-href="views/user/list.html">消缺记录统计</a>
+                </dd>
+              </dl>
+            </li>
+
+
+
+          </ul>
+        </div>
+      </div>
+
+      <!-- 页面标签 -->
+      <div class="layadmin-pagetabs" id="LAY_app_tabs">
+        <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+        <div class="layui-icon layadmin-tabs-control layui-icon-down">
+          <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
+            <li class="layui-nav-item" lay-unselect>
+              <a href="javascript:;"></a>
+              <dl class="layui-nav-child layui-anim-fadein">
+                <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+        <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+          <ul class="layui-tab-title" id="LAY_app_tabsheader">
+            <li lay-id="home/console.html" lay-attr="home/console.html" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+          </ul>
+        </div>
+      </div>
+
+
+      <!-- 主体内容 -->
+      <div class="layui-body" id="LAY_app_body">
+        <div class="layadmin-tabsbody-item layui-show">
+          <iframe src="views/home/homepage.html" frameborder="0" class="layadmin-iframe"></iframe>
+        </div>
+      </div>
+
+      <!-- 辅助元素，一般用于移动设备下遮罩 -->
+      <div class="layadmin-body-shade" layadmin-event="shade"></div>
+    </div>
+  </div>
+
+  <!--引入本地的jQuery.js-->
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <!--引入本地的Layui.js-->
+  <script type="text/javascript" src="layui/layui.js"></script>
+  <script type="text/javascript">
+      layui.config({
+          base: 'layui/layuiadmin/' //静态资源所在路径
+      }).extend({
+          index: 'lib/index' //主入口模块
+      }).use('index');
+
+  </script>
+  <script>
+    let user = sessionStorage.getItem("user");
+    if (user != null) {
+      user = JSON.parse(user);
+      console.log(user);
+      $("#login_account").text(user.loginAccount)
+    } else {
+      location.href = "/login.html";
+    }
+  </script>
+</body>
+</html>
+
+
